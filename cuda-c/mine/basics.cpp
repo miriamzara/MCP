@@ -24,6 +24,14 @@ int main(){
     cout << "sizeof(p)= "<< sizeof(p) <<endl; // 8 bytes,
     //  i.e. the size of a memory address in a 64-bit architecture
     //
+    // Strange behaviours of arrays
+    /*
+    arr automatically "decays" to a POINTER to the first element of the array
+    when it is used in expressions:
+    */
+    cout << "\n\n Array che si comportano come puntatori: " << endl;
+    cout<< "arr = " << arr << endl;
+    cout << "&arr[0] = " << &arr[0] << endl << endl; 
     cout << "ora guardiamo come si usa malloc" << endl;
     // malloc() returns a pointer to the allocated address
     //

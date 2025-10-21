@@ -62,5 +62,9 @@ __global__ void print_int_kernel(int* number){
 }
 
 __global__ void increment_int_kernel(int* number){
-    *number += 1; 
+    /* pass-by-pointer method
+    int* number = & x
+    then dereference (*) to act on the value
+    */
+    *number += 1;
 }
