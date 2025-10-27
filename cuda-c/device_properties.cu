@@ -40,5 +40,6 @@ int main() {
     printf("  Warp-size: %d\n", prop.warpSize);
     printf("  Concurrent kernels: %s\n", prop.concurrentKernels ? "yes" : "no");
     printf("  Concurrent computation/communication: %s\n\n",prop.deviceOverlap ? "yes" : "no");
+    printf("Max threads per block: %d\n", prop.maxThreadsPerBlock);
   }
 }
