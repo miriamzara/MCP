@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+
 using namespace std;
 
 /*
@@ -13,7 +14,7 @@ not the number of elements!
 __global__ void boost_brightness(int* im, int* im_size, float* brightness_factor) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < (*im_size)){
-        im[idx] = im[idx] * (*brightness_factor);
+        im[idx] = min(255, (int)(im[idx] * (*brightness_factor)));
     }
 }
 
