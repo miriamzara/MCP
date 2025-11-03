@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
     */
     cout << "2D grid matrix multiplication: "<< endl;
     dim3 blockSize_2D(THREADS_PER_BLOCK_X,THREADS_PER_BLOCK_Y);
-    dim3 gridSize_2D(ceil(float(WIDTH)/blockSize.x),ceil(float(WIDTH)/blockSize.y));
+    dim3 gridSize_2D(ceil(float(WIDTH)/blockSize_2D.x),ceil(float(WIDTH)/blockSize_2D.y));
     matrixMultiplication2D<<<gridSize_2D, blockSize_2D>>>(d_M, d_N, d_P, WIDTH);
     checkCuda(
         cudaMemcpy(P.data(), d_P, matrixSize, cudaMemcpyDeviceToHost)
