@@ -5,8 +5,27 @@
 using namespace std;
 
 /*
-Common mistake: remember that cudaMemcpy expects the number of BITES,
+Notes:
+1. remember that cudaMemcpy expects the number of BITES,
 not the number of elements!
+2. You copy the source code to the external NVIDIA device via ssh. You compile it ON the nvidia device.
+    -> your pc's cpu/gpu does NOTHING during the execution of the code. The GPU parts (__global__) are
+    processed by the device GPU, while the others are processed by the device CPU. All input/output files
+    required/created by your program are ON THE DEVICE. To have them on your pc, you need to copy via the
+    ssh connection:
+
+    miriamzara@MacBook-Pro-di-Miriam cuda-c % rsync -avz --delete /Users/miriamzara/MCP/cuda-c/ jetson@192.168.55.1:~/cuda_scripts/
+    miriamzara@MacBook-Pro-di-Miriam cuda-c % ssh jetson@192.168.55.1
+    (mcp) jetson@jetson:~/cuda_scripts/mine$ ls
+        a.out       cat.pgm         cuda_vector_mul_threads.cu  matrix_addition_solved.cu  pointer2array.cpp
+        basics.cpp  cuda_basics.cu  image_boost.cu              passing_arguments.cpp
+    (mcp) jetson@jetson:~/cuda_scripts/mine$ nvcc image_boost.cu
+    (mcp) jetson@jetson:~/cuda_scripts/mine$ ./a.out
+    (mcp) jetson@jetson:~/cuda_scripts/mine$ ls
+        a.out       cat.pgm             cuda_basics.cu              image_boost.cu             passing_arguments.cpp
+        basics.cpp  cat_brightened.pgm  cuda_vector_mul_threads.cu  matrix_addition_solved.cu  pointer2array.cpp
+    
+    miriamzara@MacBook-Pro-di-Miriam mine % scp jetson@192.168.55.1:/home/jetson/cuda_scripts/mine/cat_brightened.pgm /Users/miriamzara/MCP/cuda-c/mine
 */
 
 
