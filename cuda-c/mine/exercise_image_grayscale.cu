@@ -106,26 +106,55 @@ int main() {
     if (host_rgb == NULL) {
         return 1;  // Error reading the file
     }
+    cudaEvent_t start_alloc, start_copy, start_kernel, stop_kernel, stop_copy;
+    cudaEventCreate(&start_alloc);
+    cudaEventCreate(&start_copy);
+    cudaEventCreate(&start_kernel);
+    cudaEventCreate(&stop_kernel);
+    cudaEventCreate(&stop_copy);
 
     // Allocate memory for the grayscale image on the host
     int num_pixels = width * height;
     int*host_grayscale = (int*)malloc(num_pixels * sizeof(int));
+
     // Allocate memory for the RGB image and Grayscale image on the GPU
     int* device_rgb;
     int* device_grayscale;
+    cudaEventRecord(start_alloc);
     cudaMalloc((void**)&device_rgb, 3*num_pixels * sizeof(int));
     cudaMalloc((void**)&device_grayscale, num_pixels * sizeof(int));
+
     // Copy the RGB image data from the host to the device (GPU)
+    cudaEventRecord(start_copy);
     cudaMemcpy(device_rgb, host_rgb, 3*num_pixels * sizeof(int), cudaMemcpyHostToDevice);
+
     // Define the block and grid dimensions
     dim3 blockSize(1024);
     dim3 gridSize(ceil(float(num_pixels)/blockSize.x));
+
     // Launch the CUDA kernel to convert RGB to Grayscale
+    cudaEventRecord(start_kernel);
     rgb_to_grayscale<<<gridSize, blockSize>>>(device_rgb, device_grayscale, num_pixels);
+    cudaEventRecord(stop_kernel);
+    cudaEventSynchronize(stop_kernel);
+
     // Copy the Grayscale image data back to the host
     cudaMemcpy(host_grayscale, device_grayscale, num_pixels * sizeof(int), cudaMemcpyDeviceToHost);
+    cudaEventRecord(stop_copy);
     // Write the grayscale image to a new PGM file
     write_pgm("ny_grayscale.pgm", host_grayscale, width, height, max_val);
+
+
+    float elapsed_kernel, elapsed_copy, elapsed_alloc_to_copy;
+
+    cudaEventElapsedTime(&elapsed_kernel,start_kernel, stop_kernel); // passing elapsed by reference
+    cudaEventElapsedTime(&elapsed_copy,start_copy, stop_copy);
+    cudaEventElapsedTime(&elapsed_alloc_to_copy,start_alloc, stop_copy);
+
+    printf("Elapsed time (kernel):                 %.1f us\n", elapsed_kernel*1000);
+    printf("Elapsed time (kernel+copy):            %.1f us\n", elapsed_copy*1000);
+    printf("Elapsed time (kernel+copy+allocation): %.1f us\n", elapsed_alloc_to_copy*1000);
+
     // Free the memory on the host and the GPU
     cudaFree(device_grayscale);
     cudaFree(device_rgb);

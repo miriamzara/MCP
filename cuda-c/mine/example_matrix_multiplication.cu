@@ -6,7 +6,7 @@
 #include <assert.h>
 using namespace std;
 
-#define WIDTH 128              // Define the matrix width number
+#define WIDTH 1280              // Define the matrix width number
 #define THREADS_PER_BLOCK_X 32  // Define the number of threads in a block
 #define THREADS_PER_BLOCK_Y 32  // Define the number of threads in a block
 
