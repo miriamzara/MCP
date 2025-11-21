@@ -25,9 +25,12 @@ __global__ void convolve1D(float* d_input, float* d_output, float* d_kernel, int
 }
 
 // CUDA kernel for performing 1D convolution using shared memory
-__global__ void convolve1D_sharedMemory(/* ... */) {
-
-    // ...
+__global__ void convolve1D_sharedMemory(float* d_input, float* d_output, float* d_kernel, int input_size, int radius) {
+    int g_idx = threadIdx.x + blockIdx.x * blockDim.x; // global thread idx
+    if (g_idx < input_size){
+        __shared__ float tmp[2*radius + 1]; // block-shared
+        
+    }
 }
 
 
