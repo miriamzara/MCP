@@ -107,5 +107,6 @@ int main(){
             cout << i << "\t" << j << "\t" << array[i][j] << endl;
         }
     }
+    free(array);
     return(0);
 }
