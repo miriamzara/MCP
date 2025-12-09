@@ -1,13 +1,13 @@
-#include "import_utils.h"
+#include "MNIST_utils.h"
 
 // Paths
-const string IMAGES_PATH = "/Users/miriamzara/MCP/EXAM/data/MNIST/raw/t10k-images-idx3-ubyte";
-const string LABELS_PATH = "/Users/miriamzara/MCP/EXAM/data/MNIST/raw/t10k-labels-idx1-ubyte";
+const std::string IMAGES_PATH = "/Users/miriamzara/MCP/EXAM/data/MNIST/raw/t10k-images-idx3-ubyte";
+const std::string LABELS_PATH = "/Users/miriamzara/MCP/EXAM/data/MNIST/raw/t10k-labels-idx1-ubyte";
 
 
 
 // ---------------- MNIST functions -----------------
-uchar** read_mnist_images(string full_path, int& number_of_images, int& image_size) {
+uchar** read_mnist_images(std::string full_path, int& number_of_images, int& image_size) {
     auto reverseInt = [](int i) {
         unsigned char c1, c2, c3, c4;
         c1 = i & 255, c2 = (i >> 8) & 255, c3 = (i >> 16) & 255, c4 = (i >> 24) & 255;
@@ -36,7 +36,7 @@ uchar** read_mnist_images(string full_path, int& number_of_images, int& image_si
     }
 }
 
-uchar* read_mnist_labels(const string& full_path, int& number_of_labels) {
+uchar* read_mnist_labels(const std::string& full_path, int& number_of_labels) {
     auto reverseInt = [](int i) {
         unsigned char c1 = i & 255, c2 = (i >> 8) & 255, c3 = (i >> 16) & 255, c4 = (i >> 24) & 255;
         return ((int)c1 << 24) + ((int)c2 << 16) + ((int)c3 << 8) + c4;
@@ -58,33 +58,9 @@ uchar* read_mnist_labels(const string& full_path, int& number_of_labels) {
     return labels;
 }
 
-void save_pgm(const string& filename, uchar* data, int rows, int cols) {
+void save_pgm(const std::string& filename, uchar* data, int rows, int cols) {
     std::ofstream out(filename, std::ios::binary);
     out << "P5\n" << cols << " " << rows << "\n255\n";
     out.write((char*)data, rows * cols);
     out.close();
-}
-
-// ---------------- Neural network weights -----------------
-float* read_weights(const string filename, size_t* nrows, size_t* ncols) {
-    FILE *file = fopen(filename.c_str(), "r");
-    if (file == NULL) {
-        printf("Could not open file.\n");
-        return NULL;
-    }
-    unsigned long long r, c;
-    if (fscanf(file, "%llu %llu", &r, &c) != 2) {
-        printf("Error reading dimensions.\n");
-        fclose(file);
-        return NULL;
-    }
-    *nrows = (size_t)r; 
-    *ncols = (size_t)c;
-    size_t n_elements = (*nrows) * (*ncols);
-    float *weights = (float *)malloc(n_elements * sizeof(float)); 
-    for (size_t i = 0; i < n_elements; i++) {
-        fscanf(file, "%f", &weights[i]);
-    }
-    fclose(file);
-    return weights;  
 }
