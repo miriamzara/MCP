@@ -10,9 +10,10 @@ typedef unsigned char uchar;
 
 
 // MNIST image/label functions
-uchar** read_mnist_images(std::string full_path, int& number_of_images, int& image_size);
+int reverseInt(int);
+uchar** read_mnist_images(std::string full_path, int& num_images_to_load, int& number_of_images, int& image_size);
 uchar* read_mnist_labels(const std::string& full_path, int& number_of_labels);
-void save_pgm(const std::string& filename, uchar* data, int rows, int cols);
+void save_pgm(const std::string& filename, uchar* data);
 
 // Paths
 extern const std::string IMAGES_PATH;

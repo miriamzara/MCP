@@ -10,19 +10,22 @@
 int main(){
 
     // Test: reading the neural network
-    std::string filename = "tiny_net.bin";
+    std::string filename = "nn.bin";
     NeuralNet* nn = create_NeuralNet(filename, 1);
     free_NeuralNet(nn);
 
     // Test: read_mnist_images(), read_mnist_labels()
-
+    
     int n_images, image_size;
-    uchar** images = read_mnist_images(IMAGES_PATH, n_images, image_size);
-    std::cout << "Loaded " << n_images << " images\n";
+    int n_load = 2;
+    uchar** images = read_mnist_images(IMAGES_PATH, n_load, n_images, image_size);
+    std::cout << "Available " << n_images << " images\n";
     std::cout << "Each image has " << image_size << " pixels\n";
-    int rows = 28;
-    int cols = 28;
-    save_pgm("mnist_sample.pgm", images[0], rows, cols);
+    std::string img_filename;
+    for(int i=0; i<n_load; i++){
+        img_filename = "mnist_sample" + std::to_string(i) + ".pgm";
+        save_pgm(img_filename, images[i]);
+    }
     std::cout << "Saved mnist_sample.pgm\n";
 
     int n_labels;
@@ -34,11 +37,11 @@ int main(){
 
 
     // Cleanup
-    for(int i = 0; i < n_images; i++)
+    for(int i = 0; i < n_load; i++)
         free(images[i]);
     free(images);
     free(labels);
-
+    
     return 0;
 };
 
