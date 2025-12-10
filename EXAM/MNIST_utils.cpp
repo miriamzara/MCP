@@ -15,7 +15,7 @@ int reverseInt(int i){
 }
 
 
-uchar** read_mnist_images(std::string full_path, size_t& num_samples) {
+float** read_mnist_images(std::string full_path, size_t& num_samples) {
     /*
     full_path: path of the binary file (-ubyte) containing the images data
     num_samples: number of images to load
@@ -48,7 +48,18 @@ uchar** read_mnist_images(std::string full_path, size_t& num_samples) {
             _dataset[i] = (uchar*) malloc(image_size* sizeof(uchar));
             file.read((char *)_dataset[i], image_size);
         }
-        return _dataset;
+
+        // Casting to float and normalizing to [0, 1]
+        float** normalized_dataset = (float**)malloc(num_samples * sizeof(float*));
+        for (size_t sample_idx = 0; sample_idx < num_samples; sample_idx++) {
+            normalized_dataset[sample_idx] = (float*)malloc(image_size * sizeof(float));
+            for(size_t j = 0; j < image_size; j++){
+                normalized_dataset[sample_idx][j] = static_cast<float>(_dataset[sample_idx][j])/255.; 
+            }
+            free(_dataset[sample_idx]);
+        }
+        free(_dataset);
+        return normalized_dataset;
     } else {
         throw std::runtime_error("Cannot open file `" + full_path + "`!");
     }
@@ -79,11 +90,24 @@ uchar* read_mnist_labels(const std::string& full_path, size_t& num_samples) {
     return labels;
 }
 
-void save_pgm(const std::string& filename, uchar* data) {
+
+
+void save_pgm(const std::string& filename, float* image) {
     int rows = 28;
     int cols = 28;
+    uchar* buffer = (uchar*)malloc(rows*cols*sizeof(uchar));
+
+    for (int i = 0; i < rows * cols; i++) {
+        float val = image[i];
+        if (val < 0.0f) val = 0.0f;
+        if (val > 1.0f) val = 1.0f;
+        buffer[i] = static_cast<uchar>(val * 255.0f);
+    }
+
     std::ofstream out(filename, std::ios::binary);
     out << "P5\n" << cols << " " << rows << "\n255\n";
-    out.write((char*)data, rows * cols);
+    out.write((char*)buffer, rows * cols);
     out.close();
+
+    free(buffer);
 }

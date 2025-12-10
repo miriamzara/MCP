@@ -7,11 +7,13 @@ void free_NeuralNet(NeuralNet* nn){
     for(int i=0; i< (nn->n_layers) - 1; i++){
         free(nn->weights[i]);
         free(nn->biases[i]);
+        free(nn->o_all[i]);
     }
 
     free(nn->sizes);
     free(nn->weights);
     free(nn->biases);
+    free(nn->o_all);
 }
 
 NeuralNet* create_NeuralNet(const std::string& relative_path, bool verbose=0){
@@ -25,7 +27,7 @@ NeuralNet* create_NeuralNet(const std::string& relative_path, bool verbose=0){
 
     FILE *file = fopen(relative_path.c_str(), "rb"); // r= read, b= binary
     if (file == NULL) {
-        std::cerr << "Could not open file.\n";
+        std::cerr << "Error in create_NeuralNet(): could not open file.\n";
         return nullptr; // if allocation fails, return a null pointer
     }
 
@@ -56,8 +58,9 @@ NeuralNet* create_NeuralNet(const std::string& relative_path, bool verbose=0){
     }
 
     // weights and biases
-    net->weights = (float **)malloc( (net->n_layers-1) * sizeof(float*));
-    net->biases = (float **)malloc( (net->n_layers-1) * sizeof(float*));
+    net->weights = (float **)malloc( (net->n_layers - 1) * sizeof(float*));
+    net->biases = (float **)malloc( (net->n_layers - 1) * sizeof(float*));
+    
 
     for(int layer_idx=0; layer_idx <= net->n_layers - 2; layer_idx++){
 
@@ -97,9 +100,14 @@ NeuralNet* create_NeuralNet(const std::string& relative_path, bool verbose=0){
         }
         if(verbose){ std::cout << "\n";}
     }
-
-
     fclose(file);
+
+    // allocate output arrays
+    net->o_all = (float **)malloc( (net->n_layers) * sizeof(float*));
+    for(int layer_idx = 0; layer_idx < net->n_layers; layer_idx++){
+        net->o_all[layer_idx] = (float*)malloc( net->sizes[layer_idx] * sizeof(float) );
+    }
+
     return net;
 }
 
@@ -111,7 +119,7 @@ void ReLu(float* a, size_t length_a){
     }
 }
 
-void layer_linear_transform(float* a, float* o_previous, float* layer_weights, size_t nrows, size_t ncols){
+void layer_linear_transform(float* a, float* o_previous, float* layer_weights, float* layer_biases, size_t nrows, size_t ncols){
     /*
     layer_linear_transform() stands for Layer Linear Transformation
     a: input of layer (n) - before activation
@@ -134,6 +142,6 @@ void layer_linear_transform(float* a, float* o_previous, float* layer_weights, s
         for(size_t j=0; j<ncols; j++){
             sum += o_previous[j]*layer_weights[ncols*i + j];
         }
-        a[i] = sum;
+        a[i] = sum + layer_biases[i];
     }
 }

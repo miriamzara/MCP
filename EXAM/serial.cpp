@@ -21,19 +21,23 @@ size_t argmax(float* logits, size_t length){
 
 
 
+
+
+
+
 int main(){
 
     // Reading the neural network
-    std::string filename = "nn.bin";
-    NeuralNet* nn = create_NeuralNet(filename, 0);
+    std::string filename = "neural_networks/nn.bin";
+    NeuralNet* nn = create_NeuralNet(filename, 1); // verbose 0:False !0 True
     
 
     // Reading input data
-    size_t num_samples = 5;
-    size_t sample_idx = 4; // from 0 to (num_samples - 1)
+    size_t num_samples = 1;
+    size_t sample_idx = 0; // from 0 to (num_samples - 1)
 
-    uchar** images = read_mnist_images(IMAGES_PATH, num_samples);
-    /*
+    float** images = read_mnist_images(IMAGES_PATH, num_samples);
+    
     // Check: save the images to .pgm for visualization
     std::string img_filename;
     for(int i=0; i<num_samples; i++){
@@ -41,7 +45,7 @@ int main(){
         save_pgm(img_filename, images[i]);
     }
     std::cout << "Saved mnist_sample.pgm\n";
-    */
+    
     uchar* labels = read_mnist_labels(LABELS_PATH, num_samples);
 
     //std::cout << "Loaded " << num_samples << " labels\n";
@@ -53,15 +57,7 @@ int main(){
     // Forward pass
 
     
-    // 1. Pre- allocate arrays to store the output of each layer
-    // and the predicted label
-
-    float** o_all = (float**)malloc( (nn->n_layers) * sizeof(float*) );
-    for(int layer_idx = 0; layer_idx < nn->n_layers; layer_idx++){
-        o_all[layer_idx] = (float*)malloc( nn->sizes[layer_idx] * sizeof(float) );
-    }
-
-    // 2. Load input and true label
+    // 1. Load input and true label
     uchar y_true = labels[sample_idx];
     size_t image_size = 784;
 
@@ -69,56 +65,48 @@ int main(){
         std::cerr << "Error in forward_pass(): Input dimension != neurons in the first layer.\n";
         return 1;
     }
+    std::cout<< "Input: \n\n";
     for (size_t i = 0; i < nn->sizes[0]; i++) {
-        o_all[0][i] = static_cast<float>(images[sample_idx][i]); 
+        nn->o_all[0][i] = images[sample_idx][i]; 
+        std::cout<<nn->o_all[0][i]<<"\t";
     }
+    std::cout<<"\n\n";
 
-    // 3. Perform the forward pass
+    // 2. Perform the forward pass
     std::cout << "Forward pass \n\n";
 
     for(int layer_idx = 1; layer_idx < nn->n_layers; layer_idx++){
-        //std::cout << "Layer [" << layer_idx << "]: \n\n";
+        std::cout << "Layer [" << layer_idx << "]: \n\n";
         size_t nrows = nn->sizes[layer_idx];
         size_t ncols = nn->sizes[layer_idx - 1];
-        layer_linear_transform(o_all[layer_idx], o_all[layer_idx - 1], nn->weights[layer_idx - 1], nrows, ncols);
+        layer_linear_transform(nn->o_all[layer_idx], nn->o_all[layer_idx - 1], nn->weights[layer_idx - 1], nn->biases[layer_idx - 1], nrows, ncols);
 
         //---check
-        /*
+        
         std::cout << "Before activation: \n";
         for(int i=0; i<nrows; i++){
-            std::cout << o_all[layer_idx][i] << "\t";
+            std::cout << nn->o_all[layer_idx][i] << "\t";
         }
         std::cout<< "\n\n";
-        */
+        
         if(layer_idx < (nn->n_layers - 1)){
-            ReLu(o_all[layer_idx], nrows);
+            ReLu(nn->o_all[layer_idx], nrows);
 
             //---check
-            /*
+            
             std::cout << "After activation: \n";
             for(int i=0; i<nrows; i++){
-                std::cout << o_all[layer_idx][i] << "\t";
+                std::cout << nn->o_all[layer_idx][i] << "\t";
             }
             std::cout<< "\n\n";
-            */
+            
         }
     }
 
-    // 4. Predict
-    /*
+    // 3. Predict
+    
     size_t last = nn->n_layers - 1;
-    float* logits = o_all[last];
-
-    size_t y_pred = 0;
-    float max_logit = logits[0];
-
-    for(size_t i = 1; i < nn->sizes[last]; i++){
-        if(logits[i] > max_logit){
-            max_logit = logits[i];
-            y_pred = i;
-        }
-    }
-    */
+    size_t y_pred = argmax(nn->o_all[last], nn->sizes[last]);
 
     std::cout << "Predicted label = " << (int)y_pred << "\n";
     std::cout << "True label = " << (int)y_true << "\n";
@@ -132,10 +120,6 @@ int main(){
     free(labels);
 
     // neural net
-    for(int layer_idx = 1; layer_idx < nn->n_layers; layer_idx++){
-        free(o_all[layer_idx]);
-    }
-    free(o_all);
     free_NeuralNet(nn);
 
     return 0;
