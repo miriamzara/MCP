@@ -18,7 +18,13 @@ typedef struct{
 } NeuralNet;
 
 // Methods declarations
+
 NeuralNet* create_NeuralNet(const std::string& relative_path, bool verbose);
+
 void free_NeuralNet(NeuralNet* nn);
+
+void ReLu(float* a, size_t length_a);
+
+void layer_linear_transform(float* a, float* o_previous, float* layer_weights, size_t nrows, size_t ncols);
 
 #endif

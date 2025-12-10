@@ -102,3 +102,38 @@ NeuralNet* create_NeuralNet(const std::string& relative_path, bool verbose=0){
     fclose(file);
     return net;
 }
+
+
+
+void ReLu(float* a, size_t length_a){
+    for(size_t i=0; i< length_a; i++){
+        a[i] = (a[i] > 0.0f) ? a[i] : 0.0f;
+    }
+}
+
+void layer_linear_transform(float* a, float* o_previous, float* layer_weights, size_t nrows, size_t ncols){
+    /*
+    layer_linear_transform() stands for Layer Linear Transformation
+    a: input of layer (n) - before activation
+    o: output of layer (n-1)
+    nrows: number of neurons in layer n
+    ncols: number of neurons in layer (n-1)
+    layer_weights: flat array of nrows*ncols elements
+
+    Computes a_n = weights @ o_(n-1)
+    Overwrites the pointer a that is provided as input
+    */
+
+    if(a == nullptr || o_previous == nullptr || layer_weights == nullptr){
+        std::cerr << "Error in layer_linear_transform(): detected null pointers.\n";
+        return;
+    }
+
+    for(size_t i = 0; i < nrows; i++){
+        float sum = 0;
+        for(size_t j=0; j<ncols; j++){
+            sum += o_previous[j]*layer_weights[ncols*i + j];
+        }
+        a[i] = sum;
+    }
+}
