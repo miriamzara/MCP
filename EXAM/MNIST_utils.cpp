@@ -15,7 +15,11 @@ int reverseInt(int i){
 }
 
 
-uchar** read_mnist_images(std::string full_path, int& num_images_to_load, int& number_of_images, int& image_size) {
+uchar** read_mnist_images(std::string full_path, size_t& num_samples) {
+    /*
+    full_path: path of the binary file (-ubyte) containing the images data
+    num_samples: number of images to load
+    */
     std::ifstream file(full_path, std::ios::binary);
     if(file.is_open()) {
 
@@ -27,18 +31,20 @@ uchar** read_mnist_images(std::string full_path, int& num_images_to_load, int& n
 
         // Retrieve number_of_images and compute image size
         int n_rows = 0, n_cols = 0;
+        int number_of_images = 0;
+        int image_size = 0;
         file.read((char *)&number_of_images, sizeof(number_of_images)), number_of_images = reverseInt(number_of_images);
         file.read((char *)&n_rows, sizeof(n_rows)), n_rows = reverseInt(n_rows);
         file.read((char *)&n_cols, sizeof(n_cols)), n_cols = reverseInt(n_cols);
         image_size = n_rows * n_cols;
 
         // Populate the dataset
-        if(num_images_to_load > number_of_images){
-            throw std::runtime_error("Error in read_mnist_images(): num_images_to_load > number_of_images.");
+        if(num_samples > size_t(number_of_images)){
+            throw std::runtime_error("Error in read_mnist_images(): num_samples > number_of_images.");
         }
 
-        uchar** _dataset = (uchar**)malloc(num_images_to_load * sizeof(uchar*));
-        for(int i = 0; i < num_images_to_load; i++) {
+        uchar** _dataset = (uchar**)malloc(num_samples * sizeof(uchar*));
+        for(int i = 0; i < num_samples; i++) {
             _dataset[i] = (uchar*) malloc(image_size* sizeof(uchar));
             file.read((char *)_dataset[i], image_size);
         }
@@ -48,7 +54,7 @@ uchar** read_mnist_images(std::string full_path, int& num_images_to_load, int& n
     }
 }
 
-uchar* read_mnist_labels(const std::string& full_path, int& number_of_labels) {
+uchar* read_mnist_labels(const std::string& full_path, size_t& num_samples) {
     std::ifstream file(full_path, std::ios::binary);
     if(!file.is_open())
         throw std::runtime_error("Cannot open file `" + full_path + "`!");
@@ -56,11 +62,19 @@ uchar* read_mnist_labels(const std::string& full_path, int& number_of_labels) {
     file.read((char*)&magic_number, sizeof(magic_number));
     magic_number = reverseInt(magic_number);
     if(magic_number != 2049) throw std::runtime_error("Invalid MNIST label file!");
+
+    int number_of_labels = 0;
     file.read((char*)&number_of_labels, sizeof(number_of_labels));
     number_of_labels = reverseInt(number_of_labels);
-    uchar* labels = (uchar*) malloc(number_of_labels * sizeof(uchar));
-    file.read((char*)labels, number_of_labels);
-    if(file.gcount() != number_of_labels)
+
+    if(num_samples > size_t(number_of_labels)){
+        throw std::runtime_error("Error in read_mnist_labels(): num_samples > number_of_labels.");
+    }
+
+    uchar* labels = (uchar*) malloc(num_samples * sizeof(uchar));
+    file.read((char*)labels, num_samples);
+
+    if(file.gcount() != num_samples)
         throw std::runtime_error("Failed to read all labels");
     return labels;
 }
