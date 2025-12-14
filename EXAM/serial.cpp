@@ -21,9 +21,9 @@ std::chrono::duration<float> elapsed; // duration is an ojbect that contains the
 int main(){
 
     // --- Input ---
-    std::string filename = INPUT_FOLDER + "mlp_H16_L1.bin";
+    std::string filename = INPUT_FOLDER + "mlp_H1024_L1.bin";
     // --- Output ---
-    std::ofstream fout(OUTPUT_FOLDER + "benchmark_H16_L1.csv", std::ios::app); // app=append, out=overwrite
+    std::ofstream fout(OUTPUT_FOLDER + "JETSON_benchmark_H1024_L1.csv", std::ios::app); // app=append, out=overwrite
     for(int run_idx = 0; run_idx < N_RUNS; run_idx ++){
         fout << "run " << run_idx;
         if (run_idx < N_RUNS - 1){

@@ -1,10 +1,10 @@
 #include "MNIST_utils.h"
 
 // Paths
-const std::string IMAGES_PATH = "/Users/miriamzara/MCP/EXAM/data/MNIST/raw/t10k-images-idx3-ubyte";
-const std::string LABELS_PATH = "/Users/miriamzara/MCP/EXAM/data/MNIST/raw/t10k-labels-idx1-ubyte";
+const std::string IMAGES_PATH = "data/MNIST/raw/t10k-images-idx3-ubyte";
+const std::string LABELS_PATH = "data/MNIST/raw/t10k-labels-idx1-ubyte";
 
-
+// /Users/miriamzara/MCP/EXAM/
 
 // ---------------- MNIST functions -----------------
 
