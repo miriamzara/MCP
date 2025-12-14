@@ -8,7 +8,7 @@
 
 
 
-std::string folder_name = "serial_code_validation/"; // only use for validation of the Forward Pass code against Pytorch reference
+std::string folder_name = ""; // only use for validation of the Forward Pass code against Pytorch reference
 
 int main(){
 

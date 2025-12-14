@@ -1,0 +1,22 @@
+{
+  "network": "MLP",
+  "dtype": "float32",
+  "input_dim": 784,
+  "output_dim": 10,
+  "layers": [
+    {
+      "type": "linear",
+      "in": 784,
+      "out": 1024,
+      "activation": "relu"
+    },
+    {
+      "type": "linear",
+      "in": 1024,
+      "out": 10,
+      "activation": "none"
+    }
+  ],
+  "bias": true,
+  "weight_order": "W[out][in]"
+}

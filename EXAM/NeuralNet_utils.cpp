@@ -145,3 +145,16 @@ void layer_linear_transform(float* a, float* o_previous, float* layer_weights, f
         a[i] = sum + layer_biases[i];
     }
 }
+
+
+size_t argmax(float* logits, size_t length){
+    size_t y_pred = 0;
+    float max_logit = logits[0];
+    for(size_t i = 1; i < length; i++){
+        if(logits[i] > max_logit){
+            max_logit = logits[i];
+            y_pred = i;
+        }
+    }
+    return y_pred;
+}

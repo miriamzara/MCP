@@ -28,4 +28,7 @@ void ReLu(float* a, size_t length_a);
 
 void layer_linear_transform(float* a, float* o_previous, float* layer_weights, float* layer_biases, size_t nrows, size_t ncols);
 
+size_t argmax(float* logits, size_t length);
+
+
 #endif
