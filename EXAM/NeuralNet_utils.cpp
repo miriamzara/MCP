@@ -158,3 +158,25 @@ size_t argmax(float* logits, size_t length){
     }
     return y_pred;
 }
+
+
+void ForwardPass(NeuralNet* nn, float* input){
+    for (size_t i = 0; i < nn->sizes[0]; i++) {
+        nn->o_all[0][i] = input[i];
+    }
+    for(int layer_idx = 1; layer_idx < nn->n_layers; layer_idx++){
+        size_t nrows = nn->sizes[layer_idx];
+        size_t ncols = nn->sizes[layer_idx - 1];
+        layer_linear_transform(nn->o_all[layer_idx], nn->o_all[layer_idx - 1], nn->weights[layer_idx - 1], nn->biases[layer_idx - 1], nrows, ncols);
+        if(layer_idx < (nn->n_layers - 1)){
+            ReLu(nn->o_all[layer_idx], nrows);
+        }
+    }
+}
+
+
+size_t Predict(NeuralNet* nn){
+    size_t last = nn->n_layers - 1;
+    size_t y_pred = argmax(nn->o_all[last], nn->sizes[last]);
+    return y_pred;
+}

@@ -30,5 +30,8 @@ void layer_linear_transform(float* a, float* o_previous, float* layer_weights, f
 
 size_t argmax(float* logits, size_t length);
 
+void ForwardPass(NeuralNet* nn, float* input);
+
+size_t Predict(NeuralNet* nn);
 
 #endif
