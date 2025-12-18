@@ -2,8 +2,9 @@
 A simple program that prints the number of all threads 
 and the currently active threads
 
-To compile:         g++omp exercise_1.cpp
-
+To compile:        
+(MacOS) g++omp exercise_1.cpp
+(Jetson) g++ -fopenmp ex_00.cpp -o ex_00.out
 
 After having done this setup (only the first time):
 
