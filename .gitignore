@@ -33,3 +33,9 @@ venv.bak/
 
 
 
+*.bin
+*.ppm
+*.pgm
+*.png
+*.gz
+EXAM/data/MNIST/
